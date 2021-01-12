@@ -9,7 +9,7 @@ import Collapse from "@material-ui/core/Collapse";
 import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import CreateIcon from '@material-ui/icons/Create';
+import CreateIcon from "@material-ui/icons/Create";
 const useStyles = makeStyles((theme) => ({
   root: {
     minWidth: 290,
@@ -36,25 +36,24 @@ export default function Note(props) {
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
-  console.log(title, expanded)
   return (
     <Card className={classes.root}>
       <CardHeader
         action={
-          <IconButton aria-label="settings" onClick={() => onEdit(item)} >
+          <IconButton aria-label="settings" onClick={() => onEdit(item)}>
             <CreateIcon />
           </IconButton>
         }
         title={title?.length > 16 ? title.slice(0, 14) + "..." : title}
       />
       <CardContent>
-        <Typography variant="body3" color="textSecondary" component="p">
+        <Typography variant="body2" color="textSecondary" component="p">
           {createdAt}
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
         <IconButton
-          className={[clsx(classes.expand, expanded && [classes.expandOpen])]}
+          className={clsx(classes.expand, { [classes.expandOpen]: expanded })}
           onClick={handleExpandClick}
           aria-expanded={expanded}
           aria-label="show more"
