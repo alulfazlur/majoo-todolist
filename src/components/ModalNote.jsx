@@ -26,9 +26,19 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ModalNote(props) {
   const classes = useStyles();
-  const { show, toggle, item } = props;
-  const { title, description, createdAt, status } = item;
-
+  const {
+    show,
+    toggle,
+    item,
+    onChange,
+    onCreate,
+    onUpdate,
+    onMarkAsDone,
+    onMarkAsProgress,
+    onDelete,
+    form,
+  } = props;
+  const { title, description, createdAt, status, id } = item;
   return (
     <Modal
       className={classes.modal}
@@ -44,44 +54,66 @@ export default function ModalNote(props) {
         <div className={classes.paper}>
           <div className={classes.textContainer}>
             <TextField
-              id="outlined-helperText"
-              label="Title"
-              value={title}
+              name="title"
+              defaultValue={title}
               fullWidth
               variant="outlined"
+              onChange={onChange}
+              helperText="Input your to do title"
             />
           </div>
           <div className={classes.textContainer}>
             <TextField
-              id="outlined-helperText"
-              label="Description"
+              name="description"
               variant="outlined"
               multiline
               rows={4}
-              value={description}
+              defaultValue={description}
               fullWidth
+              onChange={onChange}
+              helperText="Input your to do description"
             />
           </div>
-          <Button variant="contained" color="primary">
-            Update
-          </Button>
-          {status != 1 ? (
+          {item?.id ? (
             <>
-              <Button
-                variant="contained"
-                color="default"
-                style={{ margin: 10 }}
-              >
-                Mark as Done
+              <Button variant="contained" color="primary" onClick={onUpdate}>
+                Update
               </Button>
-              <Button variant="contained" color="secondary">
-                Delete
-              </Button>
+              {status != 1 ? (
+                <>
+                  <Button
+                    variant="contained"
+                    color="default"
+                    style={{ margin: 10 }}
+                    onClick={onMarkAsDone}
+                  >
+                    Mark as Done
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={onDelete}
+                  >
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="default"
+                  style={{ margin: 10 }}
+                  onClick={onMarkAsProgress}
+                >
+                  Mark as In Progress
+                </Button>
+              )}
             </>
           ) : (
-            <Button variant="contained" color="default" style={{ margin: 10 }}>
-              Mark as In Progress
-            </Button>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button variant="contained" color="primary" onClick={onCreate}>
+                Create
+              </Button>
+            </div>
           )}
         </div>
       </Fade>
