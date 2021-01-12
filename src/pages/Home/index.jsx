@@ -1,165 +1,163 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import { Header, Menu, Note, AddButton, ModalNote } from "../../components";
+import { makeStyles } from "@material-ui/core/styles";
+import AutorenewIcon from "@material-ui/icons/Autorenew";
+import CheckBoxIcon from "@material-ui/icons/CheckBox";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import clsx from "clsx";
-import { makeStyles, useTheme } from "@material-ui/core/styles";
-import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import AutorenewIcon from '@material-ui/icons/Autorenew';
-import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
-const drawerWidth = 240;
+const data = [
+  {
+    id: 1,
+    title: "Make a meal",
+    description: "lorem ipsum",
+    status: 0,
+    createdAt: "2019-11-15 18:00",
+  },
+  {
+    id: 2,
+    title: "Dinner with family",
+    description: "lorem ipsum",
+    status: 0,
+    createdAt: "2019-11-16 18:00",
+  },
+  {
+    id: 3,
+    title: "Watch scary movie",
+    description: "lorem ipsum",
+    status: 0,
+    createdAt: "2019-11-15 13:00",
+  },
+  {
+    id: 4,
+    title: "Learn something new",
+    description: "lorem ipsum",
+    status: 1,
+    createdAt: "2019-11-15 08:00",
+  },
+  {
+    id: 5,
+    title: "Make a phone call to mom",
+    description: "lorem ipsum",
+    status: 1,
+    createdAt: "2019-11-15 04:00",
+  },
+];
+
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  appBar: {
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(["margin", "width"], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  hide: {
-    display: "none",
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-end",
+  loading: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
   },
   content: {
-    flexGrow: 1,
     padding: theme.spacing(3),
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: 0,
-    alignContent: 'left'
+    marginLeft: theme.spacing(9) + 1,
+    marginTop: 50,
+    flexGrow: 1,
+  },
+  rowContent: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
   },
   contentShift: {
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.easeOut,
       duration: theme.transitions.duration.enteringScreen,
     }),
-    marginLeft: drawerWidth,
+    marginLeft: 200,
+  },
+  addButton: {
+    position: "absolute",
+    right: "5%",
+    bottom: "10%",
   },
 }));
 
-function Home(props) {
+function Home() {
   const classes = useStyles();
-  const theme = useTheme();
-
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [modalData, setModalData] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [page, setPage] = useState("");
+
+  const menuList = [
+    { name: "In Progress", icon: <AutorenewIcon /> },
+    { name: "Finished", icon: <CheckBoxIcon /> },
+  ];
+
+  const onEdit = (item) => {
+    setModalData(item);
+    setShowModal(true);
+  };
+
+  const rows = [...Array(Math.ceil(data.length / 4))];
+  const datum = rows.map((row, idx) => data.slice(idx * 4, idx * 4 + 4));
+  const content = datum.map((arr, idx) => (
+    <div className={classes.rowContent}>
+      {arr.map((item, idx) => (
+        <Note
+          item={item}
+          key={idx}
+          expanded={expanded}
+          setExpanded={setExpanded}
+          onEdit={onEdit}
+        />
+      ))}
+    </div>
+  ));
+
+  useEffect(() => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+  }, [page]);
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: isOpen,
-        })}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={() => setIsOpen(true)}
-            edge="start"
-            className={clsx(classes.menuButton, isOpen && classes.hide)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap>
-            Persistent drawer
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="persistent"
-        anchor="left"
-        open={isOpen}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={() => setIsOpen(false)}>
-            {theme.direction === "ltr" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )}
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-          {["In Progress", "Finished"].map((text, index) => (
-            <ListItem button key={text}>
-              <ListItemIcon>
-                {index == 1 ? <CheckBoxIcon /> : <AutorenewIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-        
-      </Drawer>
-      <main
-        className={clsx(classes.content, {
-          [classes.contentShift]: isOpen,
-        })}
-      >
-        <div className={classes.drawerHeader} />
-        <Typography paragraph align="left">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
-          dolor purus non enim praesent elementum facilisis leo vel. Risus at
-          ultrices mi tempus imperdiet. Semper risus in hendrerit gravida rutrum
-          quisque non tellus. Convallis convallis tellus id interdum velit
-          laoreet id donec ultrices. Odio morbi quis commodo odio aenean sed
-          adipiscing. Amet nisl suscipit adipiscing bibendum est ultricies
-          integer quis. Cursus euismod quis viverra nibh cras. Metus vulputate
-          eu scelerisque felis imperdiet proin fermentum leo. Mauris commodo
-          quis imperdiet massa tincidunt. Cras tincidunt lobortis feugiat
-          vivamus at augue. At augue eget arcu dictum varius duis at consectetur
-          lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa sapien
-          faucibus et molestie ac.
-        </Typography>
-      </main>
+      <Header
+        title="My To Do List"
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        isLoading={isLoading}
+        menu={<Menu menu={menuList} onClick={setPage} />}
+      />
+      {isLoading ? (
+        <CircularProgress
+          color="secondary"
+          size={60}
+          className={classes.loading}
+        />
+      ) : (
+        <main
+          className={clsx(classes.content, {
+            [classes.contentShift]: isOpen,
+          })}
+        >
+          <div className={classes.toolbar} />
+          {content}
+          <div className={classes.addButton}>
+            <AddButton onClick={() => console.log("add")} />
+          </div>
+          <ModalNote
+            show={showModal}
+            toggle={() => setShowModal(false)}
+            item={modalData}
+          />
+        </main>
+      )}
     </div>
   );
 }
